@@ -1,1 +1,1 @@
-from .db_config import Base, engine
+from .db_config import Base, engine, get_db

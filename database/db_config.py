@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Define la URL de la base de datos (ajusta según tu configuración)
+# Define la URL de la base de datos
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"  # Para SQLite, cambiar según el motor de BD
 
 # Para usar PostgreSQL descomenta las siguientes líneas y configura las variables de entorno

@@ -1,13 +1,19 @@
+import os
 from fastapi import FastAPI
+from sqlalchemy import inspect
 from database import engine, Base
 from routes import router as api_router
-import models
+
+
 app = FastAPI()
 
 app.include_router(api_router)
 
-
-# Crear las tablas en la base de datos
-print("Creando las tablas en la base de datos...")
-Base.metadata.create_all(bind=engine)
-print("¡Tablas creadas con éxito!")
+# Verificar si la base de datos ya tiene tablas
+inspector = inspect(engine)
+if not inspector.get_table_names():
+    print("Creando las tablas en la base de datos...")
+    Base.metadata.create_all(bind=engine)
+    print("¡Tablas creadas con éxito!")
+else:
+    print("Las tablas ya existen, omitiendo creación de base de datos.")
