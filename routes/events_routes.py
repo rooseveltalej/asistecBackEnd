@@ -21,4 +21,4 @@ def update_event(event_id: int, event: schemas.EventCreate, db: Session = Depend
 
 @event_router.delete("/event_delete")
 def delete_event(event_id: int, db: Session = Depends(get_db)):
-    return {"msg": "SUCCESS"} #Falata implementar la función para eliminar un evento
+    return {"msg": "SUCCESS"} #TODO: Falta implementar la función para eliminar un evento
