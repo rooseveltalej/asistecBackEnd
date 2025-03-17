@@ -15,3 +15,21 @@ def create_event(event: schemas.EventCreate, db: Session = Depends(get_db)): #Fu
     db.commit()
     db.refresh(new_event)
     return {"msg": "SUCCESS"}
+
+def update_event(event_id: int, event: schemas.EventCreate, db: Session = Depends(get_db)): #Función para actualizar un evento, esta función se importa en el archivo events_routes.py
+    db_event = db.query(models.Event).filter(models.Event.event_id == event_id).first()
+    if db_event:
+        db_event.event_title = event.event_title
+        db_event.event_description = event.event_description
+        db_event.event_date = event.event_date
+        db_event.event_start_hour = event.event_start_hour
+        db_event.event_final_hour = event.event_final_hour
+        db_event.notification_datetime = event.notification_datetime
+        db_event.all_day = event.all_day
+        db.commit()
+        return {"msg": "SUCCESS"}
+    else:
+        raise HTTPException(status_code=404, detail="Evento no encontrado") #Si no se encuentra el evento, se devuelve un error 404
+    
+
+# Falta implementar la función para eliminar un evento
