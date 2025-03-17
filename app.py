@@ -17,3 +17,8 @@ if not inspector.get_table_names():
     print("¡Tablas creadas con éxito!")
 else:
     print("Las tablas ya existen, omitiendo creación de base de datos.")
+
+
+@app.get("/")
+async def root():
+    return {"message": "API FUNCIONANDO"}
