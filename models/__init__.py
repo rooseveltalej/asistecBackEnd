@@ -1,4 +1,4 @@
-from .Activities import Activity
+from .Activities import Activities
 from .Areas import Area
 from .Channels import Channel
 from .Courses import Course

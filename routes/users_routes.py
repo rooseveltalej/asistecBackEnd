@@ -19,14 +19,42 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    hashed_password = pwd_context.hash(user.password)  # Hash de la contraseña
-    new_user = models.User(**user.model_dump(), password=hashed_password)
-    
+    hashed_password = pwd_context.hash(user.password)
+    user_data = user.model_dump(exclude={"password"})
+    new_user = models.User(**user_data, password=hashed_password)
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
+
+    # Obtener canal principal del área del usuario
+    main_channel = db.query(models.Channel).filter(models.Channel.area_id == new_user.area_id).first()
+    if main_channel:
+        subscription = models.Subscription(
+            user_id=new_user.user_id,
+            channel_id=main_channel.channel_id,
+            is_admin=False,
+            is_favorite=False
+        )
+        db.add(subscription)
+
+    # Obtener canales informativos (de áreas con is_major = False)
+    informative_area_ids = db.query(models.Area.area_id).filter(models.Area.is_major == False).subquery()
+    informative_channels = db.query(models.Channel).filter(models.Channel.area_id.in_(informative_area_ids)).all()
+
+    for channel in informative_channels:
+        subscription = models.Subscription(
+            user_id=new_user.user_id,
+            channel_id=channel.channel_id,
+            is_admin=False,
+            is_favorite=False
+        )
+        db.add(subscription)
+
+    db.commit()
+
     return {"msg": "SUCCESS"}
+
 
 @user_router.get("/user_login")
 def login_user(mail: str, password: str, db: Session = Depends(get_db)):

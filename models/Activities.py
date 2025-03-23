@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from database import Base
 import datetime
 
-class Activity(Base):
+class Activities(Base):
     __tablename__ = "activities"
 
     activity_id = Column(Integer, primary_key=True, index=True)

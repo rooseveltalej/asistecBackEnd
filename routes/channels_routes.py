@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_db
-from controllers.channels_controllers import user_subscription, not_subscribed_channels, posts_by_channel, create_post
-
+from controllers.channels_controllers import user_subscription, not_subscribed_channels, posts_by_channel, create_post, create_channel
 
 channel_router = APIRouter(prefix="/api/channels", tags=["Channels"])
 
@@ -23,3 +22,7 @@ def posts_by_channel_route(channel_id: int, db: Session = Depends(get_db)):
 @channel_router.post("/create_post", status_code=status.HTTP_201_CREATED)
 def create_post_route(user_id: int, post: schemas.PostBase, db: Session = Depends(get_db)):
     return create_post(user_id, post, db)
+
+@channel_router.post("/create_channel", status_code=status.HTTP_201_CREATED)
+def create_channel_route(channel: schemas.ChannelBase, db: Session = Depends(get_db)):
+    return create_channel(channel, db)
