@@ -1,6 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-
 
 # Post Schemas
 class PostBase(BaseModel):
@@ -11,6 +10,4 @@ class PostBase(BaseModel):
 
 class PostResponse(PostBase):
     post_id: int
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)

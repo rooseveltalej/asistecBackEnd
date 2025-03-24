@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 # Subscription Schemas
 class SubscriptionBase(BaseModel):
@@ -9,5 +9,4 @@ class SubscriptionBase(BaseModel):
 
 class SubscriptionResponse(SubscriptionBase):
     subscription_id: int
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

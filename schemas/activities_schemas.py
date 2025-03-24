@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import date
 from typing import Optional, Dict
 
@@ -16,5 +16,4 @@ class ActivityCreate(ActivityBase):
 
 class ActivityResponse(ActivityBase):
     activity_id: int
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

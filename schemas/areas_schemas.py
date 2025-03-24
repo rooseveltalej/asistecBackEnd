@@ -1,5 +1,4 @@
-from pydantic import BaseModel
-
+from pydantic import BaseModel, ConfigDict
 
 # Area Schemas
 class AreaBase(BaseModel):
@@ -8,5 +7,4 @@ class AreaBase(BaseModel):
 
 class AreaResponse(AreaBase):
     area_id: int
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

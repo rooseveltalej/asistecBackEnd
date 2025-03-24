@@ -1,5 +1,4 @@
-from pydantic import BaseModel
-
+from pydantic import BaseModel, ConfigDict
 
 # Professor Schemas
 class ProfessorBase(BaseModel):
@@ -8,5 +7,4 @@ class ProfessorBase(BaseModel):
 
 class ProfessorResponse(ProfessorBase):
     professor_id: int
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
