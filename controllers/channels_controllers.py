@@ -5,7 +5,7 @@ import schemas
 from database import get_db
 
 # Obtener canales a los que el usuario está suscrito
-def user_subscription(user_id: int, db: Session = Depends(get_db)):
+def subscribed_channels(user_id: int, db: Session = Depends(get_db)):
     subscriptions = (
         db.query(models.Subscription)
         .filter(models.Subscription.user_id == user_id)

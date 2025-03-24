@@ -1,35 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-import models
 import schemas
 from database import get_db
+from controllers.areas_controllers import get_areas, create_area
 
 area_router = APIRouter(prefix="/api/areas", tags=["Areas"])
 
 # Obtener todas las áreas
 @area_router.get("/", response_model=list[schemas.AreaResponse])
-def get_areas(db: Session = Depends(get_db)):
-    areas = db.query(models.Area).all()
-    return areas
+def get_areas_route(db: Session = Depends(get_db)):
+    return get_areas(db)
 
-# Crear una nueva área y un canal asociado automáticamente
+# Crear una nueva área y canal asociado automáticamente
 @area_router.post("/create", response_model=schemas.AreaResponse, status_code=status.HTTP_201_CREATED)
-def create_area(area: schemas.AreaBase, db: Session = Depends(get_db)):
-    existing = db.query(models.Area).filter_by(area_name=area.area_name).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Area with this name already exists")
-
-    new_area = models.Area(**area.model_dump())
-    db.add(new_area)
-    db.commit()
-    db.refresh(new_area)
-
-    # Crear un canal asociado a la nueva área
-    new_channel = models.Channel(
-        channel_name=f"Canal de {new_area.area_name}",
-        area_id=new_area.area_id
-    )
-    db.add(new_channel)
-    db.commit()
-
-    return new_area
+def create_area_route(area: schemas.AreaBase, db: Session = Depends(get_db)):
+    return create_area(area, db)

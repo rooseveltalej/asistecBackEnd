@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_db
-
 
 def get_user_events(user_id: int, db: Session = Depends(get_db)):
     db_events = db.query(models.Event).filter(models.Event.user_id == user_id).all()
