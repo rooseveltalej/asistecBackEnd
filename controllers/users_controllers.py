@@ -51,9 +51,10 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     return {"msg": "SUCCESS"}
 
-def login_user(mail: str, password: str, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.mail == mail).first()
-    if not db_user or not verify_password(password, db_user.password):
+def login_user(user: schemas.UserLogin, db: Session):
+    db_user = db.query(models.User).filter(models.User.mail == user.mail).first()
+    
+    if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     return {

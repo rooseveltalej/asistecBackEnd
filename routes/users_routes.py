@@ -10,6 +10,6 @@ user_router = APIRouter(prefix="/api/users", tags=["Users"])
 def create_user_route(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return create_user(user, db)
 
-@user_router.get("/user_login/")
-def login_user_route(mail: str, password: str, db: Session = Depends(get_db)):
-    return login_user(mail, password, db)
+@user_router.post("/user_login/")
+def login_user_route(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    return login_user(user, db)

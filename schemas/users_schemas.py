@@ -4,7 +4,11 @@ class UserBase(BaseModel):
     name: str
     lastname: str
     mail: EmailStr
-    area_id: int  
+    area_id: int
+
+class UserLogin(BaseModel):
+    mail: EmailStr
+    password: str  
 
 class UserCreate(UserBase):
     password: str
