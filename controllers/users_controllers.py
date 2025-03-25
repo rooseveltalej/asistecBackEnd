@@ -55,7 +55,11 @@ def login_user(user: schemas.UserLogin, db: Session):
     db_user = db.query(models.User).filter(models.User.mail == user.mail).first()
     
     if not db_user or not verify_password(user.password, db_user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Invalid credentials")    
+    
+    # Check if the user is active
+    if not db_user.is_active:
+        raise HTTPException(status_code=401, detail="Inactive")
 
     return {
         "user_id": db_user.user_id,
