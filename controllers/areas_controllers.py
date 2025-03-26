@@ -28,3 +28,7 @@ def create_area(area: schemas.AreaBase, db: Session = Depends(get_db)):
     db.commit()
 
     return new_area
+
+# Obtener las áreas donde el is_major sea True
+def get_major_areas(db: Session = Depends(get_db)):
+    return db.query(models.Area).filter_by(is_major=True).all()
