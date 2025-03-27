@@ -42,32 +42,18 @@ def not_subscribed_channels(user_id: int, db: Session = Depends(get_db)):
         for ch in channels
     ]
 
-# Obtener todos los posts de un canal específico
-def posts_by_channel(channel_id: int, db: Session = Depends(get_db)):
-    posts = db.query(models.Post).filter(models.Post.channel_id == channel_id).all()
-    if not posts:
-        raise HTTPException(status_code=404, detail="No posts found for this channel")
+# Obtener todos los canales (sin importar suscripción)
+def get_all_channels(db: Session = Depends(get_db)):
+    channels = db.query(models.Channel).all()
     return [
         {
-            "post_id": post.post_id,
-            "user_id": post.user_id,
-            "content": post.content,
-            "date": post.date.strftime("%d/%m/%Y %H:%M"),
+            "channel_id": ch.channel_id,
+            "channel_name": ch.channel_name,
+            "area_id": ch.area_id
         }
-        for post in posts
+        for ch in channels
     ]
 
-# Crear un nuevo post en un canal
-def create_post(user_id: int, post: schemas.PostBase, db: Session = Depends(get_db)):
-    new_post = models.Post(
-        user_id=user_id,
-        channel_id=post.channel_id,
-        content=post.content
-    )
-    db.add(new_post)
-    db.commit()
-    db.refresh(new_post)
-    return {"msg": "SUCCESS", "post_id": new_post.post_id}
 
 # Crear un nuevo canal si no existe uno con el mismo nombre
 def create_channel(channel: schemas.ChannelBase, db: Session = Depends(get_db)):
