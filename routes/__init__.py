@@ -6,6 +6,8 @@ from .activities_routes import activity_router
 from .channels_routes import channel_router
 from .areas_routes import area_router
 from .subscriptions_routes import subscription_router
+from .posts_routes import post_router
+from .professors_routes import professor_router
 
 router = APIRouter()
 
@@ -16,3 +18,5 @@ router.include_router(activity_router, tags=["Activities"])
 router.include_router(channel_router, tags=["Channels"])
 router.include_router(area_router, tags=["Areas"])
 router.include_router(subscription_router, tags=["Subscriptions"])
+router.include_router(post_router, tags=["Posts"])
+router.include_router(professor_router, tags=["Professors"])

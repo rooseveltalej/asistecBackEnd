@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-import models
 import schemas
 from database import get_db
 from controllers.courses_controllers import create_course, get_user_courses, update_course, delete_course
