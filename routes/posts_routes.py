@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query  # <-- Aquí agregamos Query
 from sqlalchemy.orm import Session
 import schemas
 from database import get_db
@@ -11,5 +11,9 @@ def get_posts_by_channel_route(channel_id: int, db: Session = Depends(get_db)):
     return get_posts_by_channel(channel_id, db)
 
 @post_router.post("/create", status_code=status.HTTP_201_CREATED, response_model=dict)
-def create_post_route(post: schemas.PostBase, db: Session = Depends(get_db)):
-    return create_post(post, db)
+def create_post_route(
+    post: schemas.PostBase,
+    db: Session = Depends(get_db)
+):
+    return create_post(post, post.user_id, db)
+
