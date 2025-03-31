@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -22,7 +22,20 @@ def get_posts_by_channel(channel_id: int, db: Session = Depends(get_db)):
     ]
 
 # Crear un nuevo post
-def create_post(post: schemas.PostBase, db: Session = Depends(get_db)):
+def create_post(post: schemas.PostBase, user_id: int, db: Session):
+    # Verificar si el usuario es admin del canal
+    subscription = db.query(models.Subscription).filter_by(
+        user_id=user_id,
+        channel_id=post.channel_id,
+        is_admin=True
+    ).first()
+
+    if not subscription:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para publicar en este canal."
+        )
+
     new_post = models.Post(**post.model_dump())
     db.add(new_post)
     db.commit()
