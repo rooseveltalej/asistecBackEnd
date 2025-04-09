@@ -4,6 +4,7 @@ import schemas
 import models
 from database import get_db
 from datetime import datetime
+import json
 
 # Obtener las actividades asociadas a un usuario
 def get_user_activities(user_id: int, db: Session = Depends(get_db)):
@@ -16,17 +17,18 @@ def get_user_activities(user_id: int, db: Session = Depends(get_db)):
             "activity_id": act.activity_id,
             "activity_title": act.activity_title,
             "location": act.location,
-            "schedule": act.schedule,
-            "activity_start_date": act.activity_start_date.strftime("%d/%m/%Y"),
-            "activity_final_date": act.activity_final_date.strftime("%d/%m/%Y"),
+            "schedule": json.loads(act.schedule),
+            "activity_start_date": act.activity_start_date,  # ← no formateado
+            "activity_final_date": act.activity_final_date,  # ← no formateado
             "notification_datetime": act.notification_datetime,
         }
         for act in activities
     ]
 
+
 # Crear una nueva actividad
 def create_activity(activity: schemas.ActivityCreate, db: Session = Depends(get_db)):
-    new_activity = models.Activities(**activity.model_dump())
+    new_activity = models.Activities(**activity.to_db_dict())
     db.add(new_activity)
     db.commit()
     db.refresh(new_activity)
