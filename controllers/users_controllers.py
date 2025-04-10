@@ -69,5 +69,6 @@ def login_user(user: schemas.UserLogin, db: Session):
     return {
         "user_id": db_user.user_id,
         "email": db_user.mail,
-        "full_name": f"{db_user.name} {db_user.lastname}"
+        "full_name": f"{db_user.name} {db_user.lastname}",
+        "major": db_user.area.area_name
     }

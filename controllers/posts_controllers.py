@@ -15,12 +15,12 @@ def get_posts_by_channel(channel_id: int, db: Session = Depends(get_db)):
             "post_id": p.post_id,
             "channel_id": p.channel_id,
             "user_id": p.user_id,
+            "title": p.title,  # ← nuevo campo agregado
             "content": p.content,
             "date": p.date.strftime("%d/%m/%Y %H:%M")
         }
         for p in posts
     ]
-
 
 # Crear un nuevo post
 def create_post(post: schemas.PostBase, user_id: int, db: Session):
@@ -46,7 +46,6 @@ def create_post(post: schemas.PostBase, user_id: int, db: Session):
         status_code=status.HTTP_201_CREATED
     )
 
-
 def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
     # Obtener lista de IDs de canales a los que el usuario está suscrito
     subscribed_channel_ids = (
@@ -55,9 +54,17 @@ def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
         .subquery()
     )
 
-    # Obtener los 3 posts más recientes de esos canales
+    # Obtener los 3 posts más recientes con info del canal
     recent_posts = (
-        db.query(models.Post.post_id, models.Channel.channel_name)
+        db.query(
+            models.Post.post_id,
+            models.Post.channel_id,
+            models.Post.user_id,
+            models.Post.title,  # ← nuevo campo
+            models.Post.content,
+            models.Post.date,
+            models.Channel.channel_name
+        )
         .join(models.Channel, models.Post.channel_id == models.Channel.channel_id)
         .filter(models.Post.channel_id.in_(subscribed_channel_ids))
         .order_by(desc(models.Post.date))
@@ -65,13 +72,15 @@ def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
         .all()
     )
 
-    # Estructurar la respuesta
-    return {
-        "posts": [
-            {
-                "post_id": post.post_id,
-                "channel_name": post.channel_name
-            }
-            for post in recent_posts
-        ]
-    }
+    return [
+        {
+            "post_id": p.post_id,
+            "channel_id": p.channel_id,
+            "channel_name": p.channel_name,
+            "user_id": p.user_id,
+            "title": p.title,  # ← nuevo campo agregado en la respuesta
+            "content": p.content,
+            "date": p.date.strftime("%d/%m/%Y %H:%M")
+        }
+        for p in recent_posts
+    ]
