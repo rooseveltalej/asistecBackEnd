@@ -36,7 +36,7 @@ def delete_subscription(user_id: int, channel_id: int, db: Session = Depends(get
             detail="Subscription not found"
         )
 
-    db.delete(subscription)
+    subscription.is_favorite = False
     db.commit()
 
     return JSONResponse(
