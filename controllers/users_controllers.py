@@ -1,5 +1,7 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 import models
 import schemas
 from database import get_db
@@ -13,7 +15,7 @@ def verify_password(plain_password, hashed_password):
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.mail == user.mail).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
 
     hashed_password = pwd_context.hash(user.password)
     user_data = user.model_dump(exclude={"password"})
@@ -34,8 +36,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         )
         db.add(subscription)
 
-    # Obtener canales informativos (de áreas con is_major = False)
-    informative_area_ids = db.query(models.Area.area_id).filter(models.Area.is_major == False).subquery()
+    # ✅ Corregido: select() explícito en lugar de subquery()
+    informative_area_ids = select(models.Area.area_id).where(models.Area.is_major == False)
     informative_channels = db.query(models.Channel).filter(models.Channel.area_id.in_(informative_area_ids)).all()
 
     for channel in informative_channels:
@@ -49,7 +51,10 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     db.commit()
 
-    return {"msg": "SUCCESS"}
+    return JSONResponse(
+        content={"msg": "SUCCESS", "user_id": new_user.user_id},
+        status_code=status.HTTP_201_CREATED
+    )
 
 def login_user(user: schemas.UserLogin, db: Session):
     db_user = db.query(models.User).filter(models.User.mail == user.mail).first()

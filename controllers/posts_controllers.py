@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -7,9 +8,7 @@ from database import get_db
 # Obtener posts por canal
 def get_posts_by_channel(channel_id: int, db: Session = Depends(get_db)):
     posts = db.query(models.Post).filter(models.Post.channel_id == channel_id).all()
-    if not posts:
-        raise HTTPException(status_code=404, detail="No posts found for this channel")
-
+    
     return [
         {
             "post_id": p.post_id,
@@ -21,9 +20,9 @@ def get_posts_by_channel(channel_id: int, db: Session = Depends(get_db)):
         for p in posts
     ]
 
+
 # Crear un nuevo post
 def create_post(post: schemas.PostBase, user_id: int, db: Session):
-    # Verificar si el usuario es admin del canal
     subscription = db.query(models.Subscription).filter_by(
         user_id=user_id,
         channel_id=post.channel_id,
@@ -40,4 +39,8 @@ def create_post(post: schemas.PostBase, user_id: int, db: Session):
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return {"msg": "SUCCESS", "post_id": new_post.post_id}
+
+    return JSONResponse(
+        content={"msg": "SUCCESS", "post_id": new_post.post_id},
+        status_code=status.HTTP_201_CREATED
+    )

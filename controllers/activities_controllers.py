@@ -9,8 +9,6 @@ import json
 # Obtener las actividades asociadas a un usuario
 def get_user_activities(user_id: int, db: Session = Depends(get_db)):
     activities = db.query(models.Activities).filter(models.Activities.user_id == user_id).all()
-    if not activities:
-        raise HTTPException(status_code=404, detail="No activities found for this user")
 
     return [
         {
@@ -18,8 +16,8 @@ def get_user_activities(user_id: int, db: Session = Depends(get_db)):
             "activity_title": act.activity_title,
             "location": act.location,
             "schedule": json.loads(act.schedule),
-            "activity_start_date": act.activity_start_date,  # ← no formateado
-            "activity_final_date": act.activity_final_date,  # ← no formateado
+            "activity_start_date": act.activity_start_date,
+            "activity_final_date": act.activity_final_date,
             "notification_datetime": act.notification_datetime,
         }
         for act in activities
@@ -40,12 +38,14 @@ def update_activity(activity_id: int, activity: schemas.ActivityCreate, db: Sess
     if not db_activity:
         raise HTTPException(status_code=404, detail="Activity not found")
 
-    for key, value in activity.model_dump().items():
+    updated_data = activity.to_db_dict()  # Serializa schedule aquí
+    for key, value in updated_data.items():
         setattr(db_activity, key, value)
 
     db.commit()
     db.refresh(db_activity)
     return {"msg": "SUCCESS"}
+
 
 # Eliminar una actividad existente
 def delete_activity(activity_id: int, db: Session = Depends(get_db)):

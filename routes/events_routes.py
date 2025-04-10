@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 import schemas
 from database import get_db
-from controllers.events_controllers import create_event, get_user_events, update_event
+from controllers.events_controllers import create_event, get_user_events, update_event, delete_event_by_id
 
 event_router = APIRouter(prefix="/api/events", tags=["Events"])
 
@@ -20,4 +20,4 @@ def update_event(event_id: int, event: schemas.EventCreate, db: Session = Depend
 
 @event_router.delete("/event_delete")
 def delete_event(event_id: int, db: Session = Depends(get_db)):
-    return {"msg": "SUCCESS"} #TODO: Falta implementar la función para eliminar un evento
+    return delete_event_by_id(event_id, db)

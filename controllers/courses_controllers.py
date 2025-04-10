@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -7,8 +8,6 @@ from database import get_db
 # Obtener cursos asociados a un usuario
 def get_user_courses(user_id: int, db: Session = Depends(get_db)):
     courses = db.query(models.Course).filter(models.Course.user_id == user_id).all()
-    if not courses:
-        raise HTTPException(status_code=404, detail="No courses found for this user")
 
     return [
         {
@@ -26,13 +25,17 @@ def get_user_courses(user_id: int, db: Session = Depends(get_db)):
         for c in courses
     ]
 
+
 # Crear un nuevo curso
 def create_course(course: schemas.CourseCreate, db: Session = Depends(get_db)):
     new_course = models.Course(**course.model_dump())
     db.add(new_course)
     db.commit()
     db.refresh(new_course)
-    return {"msg": "SUCCESS", "course_id": new_course.course_id}
+    return JSONResponse(
+    content={"msg": "SUCCESS", "course_id": new_course.course_id},
+    status_code=status.HTTP_201_CREATED
+)
 
 # Actualizar un curso existente
 def update_course(course_id: int, course: schemas.CourseCreate, db: Session = Depends(get_db)):

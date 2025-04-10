@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -12,14 +13,14 @@ def get_areas(db: Session = Depends(get_db)):
 def create_area(area: schemas.AreaBase, db: Session = Depends(get_db)):
     existing = db.query(models.Area).filter_by(area_name=area.area_name).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Area with this name already exists")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Area with this name already exists")
 
     new_area = models.Area(**area.model_dump())
     db.add(new_area)
     db.commit()
     db.refresh(new_area)
 
-    # Crear un canal asociado a la nueva área
+    # Crear canal asociado
     new_channel = models.Channel(
         channel_name=f"Canal de {new_area.area_name}",
         area_id=new_area.area_id
@@ -27,7 +28,14 @@ def create_area(area: schemas.AreaBase, db: Session = Depends(get_db)):
     db.add(new_channel)
     db.commit()
 
-    return new_area
+    return JSONResponse(
+        content={
+            "msg": "SUCCESS",
+            "area_id": new_area.area_id,
+            "channel_id": new_channel.channel_id
+        },
+        status_code=status.HTTP_201_CREATED
+    )
 
 # Obtener las áreas donde el is_major sea True
 def get_major_areas(db: Session = Depends(get_db)):

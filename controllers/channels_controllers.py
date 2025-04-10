@@ -59,7 +59,7 @@ def get_all_channels(db: Session = Depends(get_db)):
 def create_channel(channel: schemas.ChannelBase, db: Session = Depends(get_db)):
     existing = db.query(models.Channel).filter_by(channel_name=channel.channel_name).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Channel with this name already exists")
+        raise HTTPException(status_code=409, detail="Channel with this name already exists")
 
     new_channel = models.Channel(**channel.model_dump())
     db.add(new_channel)

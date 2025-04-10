@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -8,27 +9,38 @@ def get_user_events(user_id: int, db: Session = Depends(get_db)):
     db_events = db.query(models.Event).filter(models.Event.user_id == user_id).all()
     return db_events
 
-def create_event(event: schemas.EventCreate, db: Session = Depends(get_db)): #Función para crear un evento, esta función se importa en el archivo events_routes.py
+def create_event(event: schemas.EventCreate, db: Session = Depends(get_db)):
     new_event = models.Event(**event.model_dump())
     db.add(new_event)
     db.commit()
     db.refresh(new_event)
-    return {"msg": "SUCCESS"}
+    return JSONResponse(
+        content={"msg": "SUCCESS", "event_id": new_event.event_id},
+        status_code=status.HTTP_201_CREATED
+    )
 
-def update_event(event_id: int, event: schemas.EventCreate, db: Session = Depends(get_db)): #Función para actualizar un evento, esta función se importa en el archivo events_routes.py
+def update_event(event_id: int, event: schemas.EventCreate, db: Session = Depends(get_db)):
     db_event = db.query(models.Event).filter(models.Event.event_id == event_id).first()
-    if db_event:
-        db_event.event_title = event.event_title
-        db_event.event_description = event.event_description
-        db_event.event_date = event.event_date
-        db_event.event_start_hour = event.event_start_hour
-        db_event.event_final_hour = event.event_final_hour
-        db_event.notification_datetime = event.notification_datetime
-        db_event.all_day = event.all_day
-        db.commit()
-        return {"msg": "SUCCESS"}
-    else:
-        raise HTTPException(status_code=404, detail="Evento no encontrado") #Si no se encuentra el evento, se devuelve un error 404
+    if not db_event:
+        raise HTTPException(status_code=404, detail="Evento no encontrado")
+
+    for key, value in event.model_dump().items():
+        setattr(db_event, key, value)
+
+    db.commit()
+    db.refresh(db_event)
+    return {"msg": "SUCCESS"}
     
 
-# Falta implementar la función para eliminar un evento
+def delete_event_by_id(event_id: int, db: Session = Depends(get_db)):
+    db_event = db.query(models.Event).filter(models.Event.event_id == event_id).first()
+    if not db_event:
+        raise HTTPException(status_code=404, detail="Evento no encontrado")
+
+    db.delete(db_event)
+    db.commit()
+
+    return JSONResponse(
+        content={"msg": "SUCCESS"},
+        status_code=status.HTTP_200_OK
+    )
