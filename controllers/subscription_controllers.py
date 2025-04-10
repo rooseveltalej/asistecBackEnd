@@ -24,14 +24,22 @@ def create_subscription(subscription: schemas.SubscriptionBase, db: Session = De
     )
 
 # Eliminar una suscripción existente
-def delete_subscription(subscription_id: int, db: Session = Depends(get_db)):
-    subscription = db.query(models.Subscription).filter_by(subscription_id=subscription_id).first()
+def delete_subscription(user_id: int, channel_id: int, db: Session = Depends(get_db)):
+    subscription = db.query(models.Subscription).filter_by(
+        user_id=user_id,
+        channel_id=channel_id
+    ).first()
+
     if not subscription:
-        raise HTTPException(status_code=404, detail="Subscription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Subscription not found"
+        )
 
     db.delete(subscription)
     db.commit()
+
     return JSONResponse(
-        content={"msg": "SUCCESS"}, 
-        status_code=200
+        content={"msg": "SUCCESS"},
+        status_code=status.HTTP_200_OK
     )

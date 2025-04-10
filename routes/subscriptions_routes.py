@@ -14,5 +14,5 @@ def create_subscription_route(subscription: schemas.SubscriptionBase, db: Sessio
 
 # Eliminar una suscripción
 @subscription_router.delete("/delete_subscription", response_model=dict)
-def delete_subscription_route(subscription_id: int, db: Session = Depends(get_db)):
-    return delete_subscription(subscription_id, db)
+def delete_subscription_route(user_id: int, channel_id: int, db: Session = Depends(get_db)):
+    return delete_subscription(user_id, channel_id, db)
