@@ -25,9 +25,21 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Verificar si ya existe el correo
     db_user = db.query(models.User).filter(models.User.mail == user.mail).first()
     if db_user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already registered"
+        )
+
+    # Verificar si ya existe el número de carné
+    db_carnet = db.query(models.User).filter(models.User.carnet_number == user.carnet_number).first()
+    if db_carnet:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Carnet number already registered"
+        )
 
     hashed_password = pwd_context.hash(user.password)
     user_data = user.model_dump(exclude={"password"})
@@ -37,29 +49,26 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # Obtener canal principal del área del usuario
+    # Asignación automática a canales
     main_channel = db.query(models.Channel).filter(models.Channel.area_id == new_user.area_id).first()
     if main_channel:
-        subscription = models.Subscription(
+        db.add(models.Subscription(
             user_id=new_user.user_id,
             channel_id=main_channel.channel_id,
             is_admin=False,
             is_favorite=True
-        )
-        db.add(subscription)
+        ))
 
-    # ✅ Corregido: select() explícito en lugar de subquery()
     informative_area_ids = select(models.Area.area_id).where(models.Area.is_major == False)
     informative_channels = db.query(models.Channel).filter(models.Channel.area_id.in_(informative_area_ids)).all()
 
     for channel in informative_channels:
-        subscription = models.Subscription(
+        db.add(models.Subscription(
             user_id=new_user.user_id,
             channel_id=channel.channel_id,
             is_admin=False,
             is_favorite=True
-        )
-        db.add(subscription)
+        ))
 
     db.commit()
 

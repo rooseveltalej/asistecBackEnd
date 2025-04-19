@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from database import Base
 import datetime
@@ -11,6 +11,9 @@ class User(Base):
     lastname = Column(String, nullable=False)
     mail = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+    carnet_number = Column(String, nullable=False)         # ← Nuevo campo
+    gender = Column(String, nullable=False)                # ← Nuevo campo (M/F/otro)
+    birth_date = Column(Date, nullable=False)              # ← Nuevo campo
     area_id = Column(Integer, ForeignKey("areas.area_id"))
     is_active = Column(Boolean, default=False)
     last_login = Column(DateTime, default=datetime.datetime.utcnow)
