@@ -118,7 +118,7 @@ def get_user_next_activities(user_id: int, db: Session = Depends(get_db)):
             "title": e.event_title,
             "date": e.event_date,
             "start_time": e.event_start_hour,
-            "location": e.location
+            "location": getattr(e, "location", None)  # ← si existe, se usa; si no, se pone None
         })
 
     # Actividades
