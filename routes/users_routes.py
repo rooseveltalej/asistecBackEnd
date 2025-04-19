@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 import schemas
 from database import get_db
-from controllers.users_controllers import create_user, login_user, get_user_next_activities
+from controllers.users_controllers import get_user_next_activities, activate_user
 from interfaces.auth_factory import AuthFactory
 
 user_router = APIRouter(prefix="/api/users", tags=["Users"])
@@ -16,7 +16,6 @@ def create_user_route(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     return provider.create_user(user, db)
 
-
 @user_router.post("/user_login")
 def login_user_route(user: schemas.UserLogin, db: Session = Depends(get_db)):
     try:
@@ -29,3 +28,7 @@ def login_user_route(user: schemas.UserLogin, db: Session = Depends(get_db)):
 @user_router.get("/next_activities", response_model=list)
 def get_user_next_activities_route(user_id: int, db: Session = Depends(get_db)):
     return get_user_next_activities(user_id, db)
+
+@user_router.put("/activate", response_model=dict)
+def activate_user_route(user_id: int, db: Session = Depends(get_db)):
+    return activate_user(user_id, db)

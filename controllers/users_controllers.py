@@ -174,3 +174,26 @@ def get_user_next_activities(user_id: int, db: Session = Depends(get_db)):
     upcoming.sort(key=lambda x: (x["date"], datetime.strptime(x["start_time"], "%H:%M")))
 
     return upcoming[:3]
+
+
+def activate_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    if user.is_active:
+        return JSONResponse(
+            content={"msg": "User is already active"},
+            status_code=status.HTTP_200_OK
+        )
+
+    user.is_active = True
+    db.commit()
+
+    return JSONResponse(
+        content={"msg": "User activated successfully"},
+        status_code=status.HTTP_200_OK
+    )
