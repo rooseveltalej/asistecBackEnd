@@ -17,6 +17,7 @@ def get_posts_by_channel(channel_id: int, db: Session = Depends(get_db)):
             "user_id": p.user_id,
             "title": p.title,
             "content": p.content,
+            "tags": p.tags,  # ← nuevo campo
             "date": p.date.strftime("%d/%m/%Y %H:%M")
         }
         for p in posts
@@ -47,14 +48,12 @@ def create_post(post: schemas.PostBase, user_id: int, db: Session):
     )
 
 def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
-    # Obtener lista de IDs de canales a los que el usuario está suscrito
     subscribed_channel_ids = (
         db.query(models.Subscription.channel_id)
         .filter(models.Subscription.user_id == user_id)
         .subquery()
     )
 
-    # Obtener los 3 posts más recientes con info del canal
     recent_posts = (
         db.query(
             models.Post.post_id,
@@ -62,6 +61,7 @@ def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
             models.Post.user_id,
             models.Post.title,
             models.Post.content,
+            models.Post.tags,  # ← nuevo campo
             models.Post.date,
             models.Channel.channel_name
         )
@@ -80,6 +80,7 @@ def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
             "user_id": p.user_id,
             "title": p.title,
             "content": p.content,
+            "tags": p.tags,  # ← nuevo campo en salida
             "date": p.date.strftime("%d/%m/%Y %H:%M")
         }
         for p in recent_posts

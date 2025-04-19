@@ -10,6 +10,7 @@ class Post(Base):
     channel_id = Column(Integer, ForeignKey("channels.channel_id"))
     user_id = Column(Integer, ForeignKey("users.user_id"))
     title = Column(String, nullable=False)  # <-- Nuevo campo
+    tags = Column(String, nullable=False)  # <-- Nuevo campo agregado
     content = Column(String, nullable=False)
     date = Column(DateTime, default=datetime.datetime.utcnow)
 

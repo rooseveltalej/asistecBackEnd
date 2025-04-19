@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
+from typing import Optional
 
 # Post Schemas
 class PostBase(BaseModel):
@@ -7,7 +8,8 @@ class PostBase(BaseModel):
     user_id: int
     title: str
     content: str
-    date: datetime  # En entradas puede seguir siendo datetime
+    date: datetime
+    tags: Optional[str] = None  # ← Nuevo campo opcional
 
 class PostResponse(BaseModel):
     post_id: int
@@ -16,5 +18,6 @@ class PostResponse(BaseModel):
     title: str
     content: str
     date: str  # Formato string DD/MM/YYYY HH:MM
+    tags: Optional[str] = None  # ← Nuevo campo opcional en la respuesta
 
     model_config = ConfigDict(from_attributes=True)
