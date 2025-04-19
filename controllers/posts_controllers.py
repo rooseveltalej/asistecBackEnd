@@ -15,7 +15,7 @@ def get_posts_by_channel(channel_id: int, db: Session = Depends(get_db)):
             "post_id": p.post_id,
             "channel_id": p.channel_id,
             "user_id": p.user_id,
-            "title": p.title,  # ← nuevo campo agregado
+            "title": p.title,
             "content": p.content,
             "date": p.date.strftime("%d/%m/%Y %H:%M")
         }
@@ -60,7 +60,7 @@ def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
             models.Post.post_id,
             models.Post.channel_id,
             models.Post.user_id,
-            models.Post.title,  # ← nuevo campo
+            models.Post.title,
             models.Post.content,
             models.Post.date,
             models.Channel.channel_name
@@ -78,7 +78,7 @@ def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
             "channel_id": p.channel_id,
             "channel_name": p.channel_name,
             "user_id": p.user_id,
-            "title": p.title,  # ← nuevo campo agregado en la respuesta
+            "title": p.title,
             "content": p.content,
             "date": p.date.strftime("%d/%m/%Y %H:%M")
         }

@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 import models
 import schemas
 from database import get_db
+import json
 
 # Obtener cursos asociados a un usuario
 def get_user_courses(user_id: int, db: Session = Depends(get_db)):
@@ -15,7 +16,7 @@ def get_user_courses(user_id: int, db: Session = Depends(get_db)):
             "course_title": c.course_title,
             "course_type": c.course_type,
             "location": c.location,
-            "schedule": c.schedule,
+            "schedule": json.loads(c.schedule),  # ← deserialización
             "course_start_date": c.course_start_date.strftime("%d/%m/%Y"),
             "course_final_date": c.course_final_date.strftime("%d/%m/%Y"),
             "notification_datetime": c.notification_datetime,
@@ -25,17 +26,16 @@ def get_user_courses(user_id: int, db: Session = Depends(get_db)):
         for c in courses
     ]
 
-
 # Crear un nuevo curso
 def create_course(course: schemas.CourseCreate, db: Session = Depends(get_db)):
-    new_course = models.Course(**course.model_dump())
+    new_course = models.Course(**course.to_db_dict())  # ← serializa schedule
     db.add(new_course)
     db.commit()
     db.refresh(new_course)
     return JSONResponse(
-    content={"msg": "SUCCESS", "course_id": new_course.course_id},
-    status_code=status.HTTP_201_CREATED
-)
+        content={"msg": "SUCCESS", "course_id": new_course.course_id},
+        status_code=status.HTTP_201_CREATED
+    )
 
 # Actualizar un curso existente
 def update_course(course_id: int, course: schemas.CourseCreate, db: Session = Depends(get_db)):
@@ -43,7 +43,8 @@ def update_course(course_id: int, course: schemas.CourseCreate, db: Session = De
     if not db_course:
         raise HTTPException(status_code=404, detail="Course not found")
 
-    for key, value in course.model_dump().items():
+    updated_data = course.to_db_dict()  # ← serializa schedule aquí también
+    for key, value in updated_data.items():
         setattr(db_course, key, value)
 
     db.commit()
