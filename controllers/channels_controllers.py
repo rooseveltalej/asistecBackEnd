@@ -6,12 +6,17 @@ from database import get_db
 
 # Obtener canales a los que el usuario está suscrito
 def subscribed_channels(user_id: int, db: Session = Depends(get_db)):
-    subscriptions = (
+    query = (
         db.query(models.Subscription)
         .filter(models.Subscription.user_id == user_id)
-        .join(models.Channel)
-        .all()
     )
+    query = query.filter(models.Subscription.is_favorite == True)
+    
+    
+    subscriptions = query.join(models.Channel).all()
+
+
+    
     return [
         {
             "channel_id": sub.channel.channel_id,
@@ -25,22 +30,25 @@ def subscribed_channels(user_id: int, db: Session = Depends(get_db)):
 
 # Obtener canales a los que el usuario NO está suscrito
 def not_subscribed_channels(user_id: int, db: Session = Depends(get_db)):
-    subscribed_ids = (
-        db.query(models.Subscription.channel_id)
+    query = (
+        db.query(models.Subscription)
         .filter(models.Subscription.user_id == user_id)
-        .subquery()
     )
-    channels = db.query(models.Channel).filter(~models.Channel.channel_id.in_(subscribed_ids)).all()
+
+    query = query.filter(models.Subscription.is_favorite == False)
+
+    subscriptions = query.join(models.Channel).all()
     return [
         {
-            "channel_id": ch.channel_id,
-            "channel_name": ch.channel_name,
-            "area_id": ch.area_id,
-            "is_admin": False,
-            "is_favorite": False,
+            "channel_id": sub.channel.channel_id,
+            "channel_name": sub.channel.channel_name,
+            "area_id": sub.channel.area_id,
+            "is_admin": sub.is_admin,
+            "is_favorite": sub.is_favorite,
         }
-        for ch in channels
+        for sub in subscriptions
     ]
+
 
 # Obtener todos los canales (sin importar suscripción)
 def get_all_channels(db: Session = Depends(get_db)):
