@@ -94,6 +94,23 @@ def login_user(user: schemas.UserLogin, db: Session):
         "area": db_user.area.area_name
     }
 
+def parse_datetime(date_value, time_value):
+    if isinstance(date_value, str):
+        date_obj = datetime.strptime(date_value, "%Y-%m-%d").date()
+    elif isinstance(date_value, datetime):
+        date_obj = date_value.date()
+    else:
+        date_obj = date_value
+
+    if isinstance(time_value, str):
+        time_obj = datetime.strptime(time_value, "%H:%M").time()
+    elif isinstance(time_value, datetime):
+        time_obj = time_value.time()
+    else:
+        time_obj = time_value
+
+    return datetime.combine(date_obj, time_obj)
+
 def get_next_occurrence(start_date: date, final_date: date, schedule: dict) -> tuple | None:
     now = datetime.now()
 
@@ -138,10 +155,11 @@ def get_user_next_activities(user_id: int, db: Session = Depends(get_db)):
             "id": e.event_id,
             "type": "event",
             "title": e.event_title,
-            "date": e.event_date,
-            "start_time": e.event_start_hour,
-            "location": getattr(e, "location", None)  # ← si existe, se usa; si no, se pone None
+            "date": e.event_date.strftime("%Y-%m-%d"),  # ← date homogéneo
+            "start_time": e.event_start_hour.strftime("%H:%M"),  # ← hora homogénea
+            "location": getattr(e, "location", None)
         })
+
 
     # Actividades
     activities = db.query(models.Activities).filter(
@@ -184,7 +202,7 @@ def get_user_next_activities(user_id: int, db: Session = Depends(get_db)):
                 })
 
     # Ordenar por fecha y hora
-    upcoming.sort(key=lambda x: (x["date"].date() if isinstance(x["date"], datetime) else x["date"], x["start_time"]))
+    upcoming.sort(key=lambda x: parse_datetime(x["date"], x["start_time"]))
 
     return upcoming[:3]
 
