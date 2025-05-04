@@ -74,3 +74,5 @@ def create_channel(channel: schemas.ChannelBase, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_channel)
     return {"msg": "SUCCESS", "channel_id": new_channel.channel_id}
+
+

@@ -95,10 +95,16 @@ def login_user(user: schemas.UserLogin, db: Session):
     }
 
 def get_next_occurrence(start_date: date, final_date: date, schedule: dict) -> tuple | None:
-    today = date.today()
+    now = datetime.now()
 
-    for day_offset in range(0, 14):  # Ver próximos 14 días
-        check_date = today + timedelta(days=day_offset)
+    # Forzar tipos de fecha
+    if isinstance(start_date, datetime):
+        start_date = start_date.date()
+    if isinstance(final_date, datetime):
+        final_date = final_date.date()
+
+    for day_offset in range(0, 14):  # Buscar en los próximos 14 días
+        check_date = now.date() + timedelta(days=day_offset)
         if not (start_date <= check_date <= final_date):
             continue
 
@@ -106,8 +112,17 @@ def get_next_occurrence(start_date: date, final_date: date, schedule: dict) -> t
         for entry in schedule.values():
             scheduled_day = weekday_map.get(entry["date"].lower())
             if scheduled_day == weekday:
-                return check_date, entry["start_time"]
+                start_time_str = entry["start_time"]
+                start_time_dt = datetime.strptime(start_time_str, "%H:%M").time()
+
+                # Comparar también la hora si el día es hoy
+                if check_date == now.date() and start_time_dt <= now.time():
+                    continue  # Ya pasó esa hora hoy
+
+                return check_date, start_time_str
+
     return None
+
 
 
 def get_user_next_activities(user_id: int, db: Session = Depends(get_db)):
