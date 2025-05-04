@@ -123,8 +123,6 @@ def get_next_occurrence(start_date: date, final_date: date, schedule: dict) -> t
 
     return None
 
-
-
 def get_user_next_activities(user_id: int, db: Session = Depends(get_db)):
     today = date.today()
     upcoming = []
@@ -186,7 +184,7 @@ def get_user_next_activities(user_id: int, db: Session = Depends(get_db)):
                 })
 
     # Ordenar por fecha y hora
-    upcoming.sort(key=lambda x: (x["date"], datetime.strptime(x["start_time"], "%H:%M")))
+    upcoming.sort(key=lambda x: (x["date"].date() if isinstance(x["date"], datetime) else x["date"], x["start_time"]))
 
     return upcoming[:3]
 
