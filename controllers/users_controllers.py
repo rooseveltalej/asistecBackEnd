@@ -41,6 +41,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="Carnet number already registered"
         )
 
+    # Crear el usuario
     hashed_password = pwd_context.hash(user.password)
     user_data = user.model_dump(exclude={"password"})
     new_user = models.User(**user_data, password=hashed_password)
@@ -49,7 +50,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # Asignación automática a canales
+    # 1. Suscribir al canal principal del área asignada
     main_channel = db.query(models.Channel).filter(models.Channel.area_id == new_user.area_id).first()
     if main_channel:
         db.add(models.Subscription(
@@ -59,10 +60,22 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
             is_favorite=True
         ))
 
-    informative_area_ids = select(models.Area.area_id).where(models.Area.is_major == False)
-    informative_channels = db.query(models.Channel).filter(models.Channel.area_id.in_(informative_area_ids)).all()
+    # 2. Suscribir a los 3 canales específicos por nombre
+    area_names = [
+        "DEVESA",
+        "Escuela de Ciencias Naturales y Exactas",
+        "Escuela de Ciencias del Lenguaje"
+    ]
 
-    for channel in informative_channels:
+    # Buscar los canales por nombre de área
+    additional_channels = (
+        db.query(models.Channel)
+        .join(models.Area)
+        .filter(models.Area.area_name.in_(area_names))
+        .all()
+    )
+
+    for channel in additional_channels:
         db.add(models.Subscription(
             user_id=new_user.user_id,
             channel_id=channel.channel_id,
