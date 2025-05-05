@@ -57,3 +57,30 @@ def delete_subscription(user_id: int, channel_id: int, db: Session = Depends(get
         content={"msg": "SUCCESS"},
         status_code=status.HTTP_200_OK
     )
+
+# Asignar privilegios de administrador a una suscripción existente
+def make_admin(user_id: int, channel_id: int, db: Session = Depends(get_db)):
+    # Buscar la suscripción correspondiente
+    subscription = db.query(models.Subscription).filter_by(
+        user_id=user_id,
+        channel_id=channel_id
+    ).first()
+
+    if not subscription:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Subscription not found"
+        )
+
+    # Actualizar el campo is_admin a True
+    subscription.is_admin = True
+    db.commit()
+    db.refresh(subscription)
+
+    return JSONResponse(
+        content={
+            "msg": "SUCCESS - User promoted to admin",
+            "subscription_id": subscription.subscription_id
+        },
+        status_code=status.HTTP_200_OK
+    )
