@@ -48,12 +48,17 @@ def create_post(post: schemas.PostBase, user_id: int, db: Session):
     )
 
 def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
+    # Subconsulta que filtra solo canales favoritos
     subscribed_channel_ids = (
         db.query(models.Subscription.channel_id)
-        .filter(models.Subscription.user_id == user_id)
+        .filter(
+            models.Subscription.user_id == user_id,
+            models.Subscription.is_favorite == True  # ← solo suscritos
+        )
         .subquery()
     )
 
+    # Consulta de los posts recientes de esos canales
     recent_posts = (
         db.query(
             models.Post.post_id,
@@ -61,7 +66,7 @@ def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
             models.Post.user_id,
             models.Post.title,
             models.Post.content,
-            models.Post.tags,  # ← nuevo campo
+            models.Post.tags,
             models.Post.date,
             models.Channel.channel_name
         )
@@ -80,7 +85,7 @@ def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
             "user_id": p.user_id,
             "title": p.title,
             "content": p.content,
-            "tags": p.tags,  # ← nuevo campo en salida
+            "tags": p.tags,
             "date": p.date.strftime("%d/%m/%Y %H:%M")
         }
         for p in recent_posts
