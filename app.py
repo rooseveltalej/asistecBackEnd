@@ -35,8 +35,16 @@ if not inspector.get_table_names():
     # Áreas iniciales con su bandera is_major
     initial_areas = [
         {"area_name": "DEVESA", "is_major": False},
-        {"area_name": "Escuela de Ciencias Naturales y Exactas", "is_major": False},
-        {"area_name": "Escuela de Ciencias del Lenguaje", "is_major": False},
+        {"area_name": "Escuela Ciencias Naturales y Exactas San Carlos", "is_major": False},
+        {"area_name": "Escuela de Ciencias del Lenguaje San Carlos", "is_major": False},
+        {"area_name": "Dirección de Campus Tecnológico Local San Carlos", "is_major": False},
+        {"area_name": "Ing. En Computación San Carlos", "is_major": True},
+        {"area_name": "Ing. Electrónica San Carlos", "is_major": True},
+        {"area_name": "Ing. Producción Industrial San Carlos", "is_major": True},
+        {"area_name": "Ing. Agronomía San Carlos", "is_major": True},
+        {"area_name": "Administración de Empresas San Carlos", "is_major": True},
+        {"area_name": "Gestión del Turismo Rural Sostenible San Carlos", "is_major": True},  
+        {"area_name": "Gestión en Sostenibilidad Turística Sostenible San Carlos", "is_major": True},  
     ]
 
     for area_data in initial_areas:

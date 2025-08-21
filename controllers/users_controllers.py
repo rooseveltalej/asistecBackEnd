@@ -21,24 +21,29 @@ weekday_map = {day.lower(): i for i, day in enumerate(calendar.day_name)}
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
 
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Verificar si ya existe el correo
     db_user = db.query(models.User).filter(models.User.mail == user.mail).first()
     if db_user:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered"
+            status_code=status.HTTP_409_CONFLICT, detail="Email already registered"
         )
 
     # Verificar si ya existe el número de carné
-    db_carnet = db.query(models.User).filter(models.User.carnet_number == user.carnet_number).first()
+    db_carnet = (
+        db.query(models.User)
+        .filter(models.User.carnet_number == user.carnet_number)
+        .first()
+    )
     if db_carnet:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Carnet number already registered"
+            detail="Carnet number already registered",
         )
 
     # Crear el usuario
@@ -51,20 +56,26 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     # 1. Suscribir al canal principal del área asignada
-    main_channel = db.query(models.Channel).filter(models.Channel.area_id == new_user.area_id).first()
+    main_channel = (
+        db.query(models.Channel)
+        .filter(models.Channel.area_id == new_user.area_id)
+        .first()
+    )
     if main_channel:
-        db.add(models.Subscription(
-            user_id=new_user.user_id,
-            channel_id=main_channel.channel_id,
-            is_admin=False,
-            is_favorite=True
-        ))
+        db.add(
+            models.Subscription(
+                user_id=new_user.user_id,
+                channel_id=main_channel.channel_id,
+                is_admin=False,
+                is_favorite=True,
+            )
+        )
 
     # 2. Suscribir a los 3 canales específicos por nombre
     area_names = [
         "DEVESA",
         "Escuela de Ciencias Naturales y Exactas",
-        "Escuela de Ciencias del Lenguaje"
+        "Escuela de Ciencias del Lenguaje",
     ]
 
     # Buscar los canales por nombre de área
@@ -76,26 +87,29 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     )
 
     for channel in additional_channels:
-        db.add(models.Subscription(
-            user_id=new_user.user_id,
-            channel_id=channel.channel_id,
-            is_admin=False,
-            is_favorite=True
-        ))
+        db.add(
+            models.Subscription(
+                user_id=new_user.user_id,
+                channel_id=channel.channel_id,
+                is_admin=False,
+                is_favorite=True,
+            )
+        )
 
     db.commit()
 
     return JSONResponse(
         content={"msg": "SUCCESS", "user_id": new_user.user_id},
-        status_code=status.HTTP_201_CREATED
+        status_code=status.HTTP_201_CREATED,
     )
+
 
 def login_user(user: schemas.UserLogin, db: Session):
     db_user = db.query(models.User).filter(models.User.mail == user.mail).first()
-    
+
     if not db_user or not verify_password(user.password, db_user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")    
-    
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
     # Check if the user is active
     if not db_user.is_active:
         raise HTTPException(status_code=401, detail="Inactive")
@@ -104,8 +118,9 @@ def login_user(user: schemas.UserLogin, db: Session):
         "user_id": db_user.user_id,
         "email": db_user.mail,
         "full_name": f"{db_user.name} {db_user.lastname}",
-        "area": db_user.area.area_name
+        "area": db_user.area.area_name,
     }
+
 
 def parse_datetime(date_value, time_value):
     if isinstance(date_value, str):
@@ -124,7 +139,10 @@ def parse_datetime(date_value, time_value):
 
     return datetime.combine(date_obj, time_obj)
 
-def get_next_occurrence(start_date: date, final_date: date, schedule: dict) -> tuple | None:
+
+def get_next_occurrence(
+    start_date: date, final_date: date, schedule: dict
+) -> tuple | None:
     now = datetime.now()
 
     # Forzar tipos de fecha
@@ -153,66 +171,76 @@ def get_next_occurrence(start_date: date, final_date: date, schedule: dict) -> t
 
     return None
 
+
 def get_user_next_activities(user_id: int, db: Session = Depends(get_db)):
     today = date.today()
     upcoming = []
 
     # Eventos
-    events = db.query(models.Event).filter(
-        models.Event.user_id == user_id,
-        models.Event.event_date >= today
-    ).order_by(models.Event.event_date.asc()).all()
+    events = (
+        db.query(models.Event)
+        .filter(models.Event.user_id == user_id, models.Event.event_date >= today)
+        .order_by(models.Event.event_date.asc())
+        .all()
+    )
 
     for e in events:
-        upcoming.append({
-            "id": e.event_id,
-            "type": "event",
-            "title": e.event_title,
-            "date": e.event_date.strftime("%Y-%m-%d"),  # ← date homogéneo
-            "start_time": e.event_start_hour.strftime("%H:%M"),  # ← hora homogénea
-            "location": getattr(e, "location", None)
-        })
-
+        upcoming.append(
+            {
+                "id": e.event_id,
+                "type": "event",
+                "title": e.event_title,
+                "date": e.event_date.strftime("%Y-%m-%d"),  # ← date homogéneo
+                "start_time": e.event_start_hour.strftime("%H:%M"),  # ← hora homogénea
+                "location": getattr(e, "location", None),
+            }
+        )
 
     # Actividades
-    activities = db.query(models.Activities).filter(
-        models.Activities.user_id == user_id
-    ).all()
+    activities = (
+        db.query(models.Activities).filter(models.Activities.user_id == user_id).all()
+    )
 
     for a in activities:
         schedule = json.loads(a.schedule)
-        next_occurrence = get_next_occurrence(a.activity_start_date, a.activity_final_date, schedule)
+        next_occurrence = get_next_occurrence(
+            a.activity_start_date, a.activity_final_date, schedule
+        )
         if next_occurrence:
             occ_date, start_time = next_occurrence
             if occ_date >= today:
-                upcoming.append({
-                    "id": a.activity_id,
-                    "type": "activity",
-                    "title": a.activity_title,
-                    "date": occ_date,
-                    "start_time": start_time,
-                    "location": a.location
-                })
+                upcoming.append(
+                    {
+                        "id": a.activity_id,
+                        "type": "activity",
+                        "title": a.activity_title,
+                        "date": occ_date,
+                        "start_time": start_time,
+                        "location": a.location,
+                    }
+                )
 
     # Cursos
-    courses = db.query(models.Course).filter(
-        models.Course.user_id == user_id
-    ).all()
+    courses = db.query(models.Course).filter(models.Course.user_id == user_id).all()
 
     for c in courses:
         schedule = json.loads(c.schedule)
-        next_occurrence = get_next_occurrence(c.course_start_date, c.course_final_date, schedule)
+        next_occurrence = get_next_occurrence(
+            c.course_start_date, c.course_final_date, schedule
+        )
         if next_occurrence:
             occ_date, start_time = next_occurrence
             if occ_date >= today:
-                upcoming.append({
-                    "id": c.course_id,
-                    "type": "course",
-                    "title": c.course_title,
-                    "date": occ_date,
-                    "start_time": start_time,
-                    "location": c.location
-                })
+                upcoming.append(
+                    {
+                        "id": c.course_id,
+                        "type": "course",
+                        "title": c.course_title,
+                        "date": occ_date,
+                        "start_time": start_time,
+                        "location": c.location,
+                    }
+                )
 
     # Ordenar por fecha y hora
     upcoming.sort(key=lambda x: parse_datetime(x["date"], x["start_time"]))
@@ -224,20 +252,17 @@ def activate_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.user_id == user_id).first()
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
     if user.is_active:
         return JSONResponse(
-            content={"msg": "User is already active"},
-            status_code=status.HTTP_200_OK
+            content={"msg": "User is already active"}, status_code=status.HTTP_200_OK
         )
 
     user.is_active = True
     db.commit()
 
     return JSONResponse(
-        content={"msg": "User activated successfully"},
-        status_code=status.HTTP_200_OK
+        content={"msg": "User activated successfully"}, status_code=status.HTTP_200_OK
     )
