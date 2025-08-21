@@ -74,8 +74,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # 2. Suscribir a los 3 canales específicos por nombre
     area_names = [
         "DEVESA",
-        "Escuela de Ciencias Naturales y Exactas",
-        "Escuela de Ciencias del Lenguaje",
+        "Escuela Ciencias Naturales y Exactas San Carlos",
+        "Escuela de Ciencias del Lenguaje San Carlos",
     ]
 
     # Buscar los canales por nombre de área
