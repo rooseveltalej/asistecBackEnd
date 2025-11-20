@@ -52,6 +52,7 @@ Opciones:
 - Define `DATABASE_URL` para usar cualquier instancia (ej. cloud/local) sin depender de Docker.
 - Si `DATABASE_URL` está vacío y existen las variables de Postgres, se usará esa conexión.
 - Si no hay Postgres disponible, el backend cae en SQLite local (`test.db`).
+- El driver Postgres se basa en `psycopg[binary]` para evitar dependencias nativas como `pg_config`.
 
 ### 4) Pruebas
 
