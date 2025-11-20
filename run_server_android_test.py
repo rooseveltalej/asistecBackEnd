@@ -4,8 +4,8 @@ import sys
 if __name__ == "__main__":
 
     command = [
-        sys.executable, "-m", "uvicorn", "app:app",
-        ##sys.executable, "-m", "uvicorn", "--host", "0.0.0.0", "app:app",
+        ##sys.executable, "-m", "uvicorn", "app:app",
+        sys.executable, "-m", "uvicorn", "--host", "0.0.0.0", "app:app",
         "--reload",
         "--port", "8000",
     ]

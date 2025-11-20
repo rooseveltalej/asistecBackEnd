@@ -1,6 +1,7 @@
 # Standard library
 import calendar
 import json
+from typing import Optional, Tuple
 from datetime import date, datetime, timedelta
 
 # Third-party packages
@@ -142,7 +143,7 @@ def parse_datetime(date_value, time_value):
 
 def get_next_occurrence(
     start_date: date, final_date: date, schedule: dict
-) -> tuple | None:
+) -> Optional[Tuple[date, str]]:
     now = datetime.now()
 
     # Forzar tipos de fecha
