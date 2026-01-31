@@ -1,6 +1,7 @@
 # Standard library
 import calendar
 import json
+from typing import Optional, Tuple
 from datetime import date, datetime, timedelta
 
 # Third-party packages
