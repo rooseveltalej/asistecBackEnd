@@ -14,6 +14,7 @@ from passlib.context import CryptContext
 import models
 import schemas
 from database import get_db
+from typing import Optional
 
 
 # Mapea días a números (Monday = 0)
@@ -142,7 +143,7 @@ def parse_datetime(date_value, time_value):
 
 def get_next_occurrence(
     start_date: date, final_date: date, schedule: dict
-) -> tuple | None:
+) -> Optional[tuple]:
     now = datetime.now()
 
     # Forzar tipos de fecha
