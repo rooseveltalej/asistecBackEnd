@@ -15,6 +15,7 @@ from passlib.context import CryptContext
 import models
 import schemas
 from database import get_db
+from typing import Optional
 
 
 # Mapea días a números (Monday = 0)
@@ -75,8 +76,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # 2. Suscribir a los 3 canales específicos por nombre
     area_names = [
         "DEVESA",
-        "Escuela Ciencias Naturales y Exactas San Carlos",
-        "Escuela de Ciencias del Lenguaje San Carlos",
+        "Escuela de Ciencias Naturales y Exactas",
+        "Escuela de Ciencias del Lenguaje",
     ]
 
     # Buscar los canales por nombre de área
@@ -143,7 +144,7 @@ def parse_datetime(date_value, time_value):
 
 def get_next_occurrence(
     start_date: date, final_date: date, schedule: dict
-) -> Optional[Tuple[date, str]]:
+) -> Optional[tuple]:
     now = datetime.now()
 
     # Forzar tipos de fecha

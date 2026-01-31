@@ -4,45 +4,31 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Load environment variables from .env
+# Cargar variables de entorno desde .env
 load_dotenv()
 
+# Obtener datos de conexión desde .env
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_DB = os.getenv("POSTGRES_DB")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
 
-def build_postgres_url() -> Optional[str]:
-    """Return a Postgres URL if the required vars are present."""
-    user = os.getenv("POSTGRES_USER")
-    password = os.getenv("POSTGRES_PASSWORD")
-    database = os.getenv("POSTGRES_DB")
-    host = os.getenv("POSTGRES_HOST", "localhost")
-    port = os.getenv("POSTGRES_PORT", "5432")
-
-    if not all([user, password, database]):
-        return None
-
-    # Use psycopg3 driver (binary wheel avoids pg_config dependency).
-    return f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}"
-
-
-# Prefer an explicit DATABASE_URL, then any Postgres env, and finally SQLite.
+# Construir URL de conexión
 SQLALCHEMY_DATABASE_URL = (
-    os.getenv("DATABASE_URL")
-    or build_postgres_url()
-    or "sqlite:///./test.db"
+    f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 )
 
-engine_kwargs = {}
-if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
-    engine_kwargs["connect_args"] = {"check_same_thread": False}
+# Crear motor SQLAlchemy (PostgreSQL no necesita connect_args)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
-
-# Session configuration
+# Crear sesión
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base class for models
+# Base para los modelos
 Base = declarative_base()
 
-# Dependency for DB session injection in routes
+# Dependencia para inyectar sesión en rutas
 def get_db():
     db = SessionLocal()
     try:
