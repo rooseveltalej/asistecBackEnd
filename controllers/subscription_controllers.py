@@ -47,8 +47,8 @@ def create_subscription(
     )
 
 
-# Eliminar una suscripción existente
-def delete_subscription(user_id: int, channel_id: int, db: Session = Depends(get_db)):
+# Cancelar una suscripción existente (marca is_favorite=False)
+def cancel_subscription(user_id: int, channel_id: int, db: Session = Depends(get_db)):
     subscription = (
         db.query(models.Subscription)
         .filter_by(user_id=user_id, channel_id=channel_id)
