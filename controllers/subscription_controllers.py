@@ -47,7 +47,6 @@ def create_subscription(
     )
 
 
-# Cancelar una suscripción existente (marca is_subscribed=False)
 def cancel_subscription(user_id: int, channel_id: int, db: Session = Depends(get_db)):
     subscription = (
         db.query(models.Subscription)
@@ -58,6 +57,15 @@ def cancel_subscription(user_id: int, channel_id: int, db: Session = Depends(get
     if not subscription:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
+        )
+
+    channel = db.query(models.Channel).filter_by(channel_id=channel_id).first()
+    user = db.query(models.User).filter_by(user_id=user_id).first()
+
+    if channel and user and channel.area_id == user.area_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No puedes desuscribirte del canal de tu carrera",
         )
 
     subscription.is_subscribed = False

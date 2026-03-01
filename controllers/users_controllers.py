@@ -144,6 +144,7 @@ def login_user(user: schemas.UserLogin, db: Session):
         "email": db_user.mail,
         "full_name": f"{db_user.name} {db_user.lastname}",
         "area": db_user.area.area_name,
+        "area_id": db_user.area_id,
     }
 
 
