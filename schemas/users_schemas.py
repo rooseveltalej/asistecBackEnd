@@ -22,3 +22,16 @@ class UserResponse(UserBase):
     full_name: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class UserListResponse(BaseModel):
+    user_id: int
+    name: str
+    lastname: str
+    mail: str
+    carnet_number: str
+    gender: str
+    birth_date: date
+    area_id: int
+    is_active: bool
+
+    model_config = ConfigDict(from_attributes=True)

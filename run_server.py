@@ -5,7 +5,7 @@ if __name__ == "__main__":
 
     command = [
         sys.executable, "-m", "uvicorn", "app:app",
-        ##sys.executable, "-m", "uvicorn", "--host", "0.0.0.0", "app:app",
+        "--host", "0.0.0.0",
         "--reload",
         "--port", "8000",
     ]
