@@ -11,6 +11,11 @@ class PostBase(BaseModel):
     date: datetime
     tags: Optional[str] = None  # ← Nuevo campo opcional
 
+class PostUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    tags: Optional[str] = None
+
 class PostResponse(BaseModel):
     post_id: int
     channel_id: int

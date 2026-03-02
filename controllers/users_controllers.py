@@ -73,6 +73,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # mejorando la separación de responsabilidades y facilitando el testing independiente.
 
     db.add(new_user)
+    db.flush()
 
     # 1. Suscribir al canal principal del área asignada
     main_channel = (

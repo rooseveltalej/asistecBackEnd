@@ -50,6 +50,67 @@ def create_post(post: schemas.PostBase, user_id: int, db: Session):
     )
 
 
+def update_post(post_id: int, user_id: int, post_data: schemas.PostUpdate, db: Session):
+    post = db.query(models.Post).filter(models.Post.post_id == post_id).first()
+    if not post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
+        )
+
+    subscription = (
+        db.query(models.Subscription)
+        .filter_by(user_id=user_id, channel_id=post.channel_id, is_admin=True)
+        .first()
+    )
+    if not subscription:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para editar en este canal.",
+        )
+
+    if post_data.title is not None:
+        post.title = post_data.title
+    if post_data.content is not None:
+        post.content = post_data.content
+    if post_data.tags is not None:
+        post.tags = post_data.tags
+
+    db.commit()
+    db.refresh(post)
+
+    return JSONResponse(
+        content={"msg": "SUCCESS", "post_id": post.post_id},
+        status_code=status.HTTP_200_OK,
+    )
+
+
+def delete_post(post_id: int, user_id: int, db: Session):
+    post = db.query(models.Post).filter(models.Post.post_id == post_id).first()
+    if not post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Post not found"
+        )
+
+    subscription = (
+        db.query(models.Subscription)
+        .filter_by(user_id=user_id, channel_id=post.channel_id, is_admin=True)
+        .first()
+    )
+    if not subscription:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para eliminar en este canal.",
+        )
+
+    db.delete(post)
+    db.commit()
+
+    return JSONResponse(
+        content={"msg": "SUCCESS"},
+        status_code=status.HTTP_200_OK,
+    )
+
+
 def get_recent_user_posts(user_id: int, db: Session = Depends(get_db)):
     # Subconsulta que filtra solo canales favoritos
     subscribed_channel_ids = (
