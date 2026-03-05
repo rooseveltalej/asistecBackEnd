@@ -6,4 +6,4 @@ from .events_schemas import EventCreate, EventResponse, EventBase
 from .posts_schemas import PostResponse, PostCreate
 from .professors_schemas import ProfessorResponse, ProfessorBase
 from .subscriptions_schemas import SubscriptionResponse, SubscriptionBase
-from .users_schemas import UserCreate, UserResponse, UserBase, UserLogin, UserListResponse
+from .users_schemas import UserCreate, UserBase, UserLogin, UserListResponse

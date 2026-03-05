@@ -17,12 +17,6 @@ class UserLogin(BaseModel):
 class UserCreate(UserBase):
     password: str
 
-class UserResponse(UserBase):
-    user_id: int
-    full_name: str
-
-    model_config = ConfigDict(from_attributes=True)
-
 class UserListResponse(BaseModel):
     user_id: int
     name: str
