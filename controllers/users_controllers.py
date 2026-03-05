@@ -1,7 +1,7 @@
 # Standard library
 import calendar
 import json
-from typing import Optional, Tuple
+from typing import Optional
 from datetime import date, datetime, timedelta
 
 # Third-party packages
@@ -15,7 +15,6 @@ from passlib.context import CryptContext
 import models
 import schemas
 from database import get_db
-from typing import Optional
 
 
 # Mapea días a números (Monday = 0)
