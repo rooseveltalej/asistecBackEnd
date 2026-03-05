@@ -11,6 +11,11 @@ class PostCreate(BaseModel):
     tags: Optional[str] = None
     # date se omite — el modelo la asigna automáticamente (default=datetime.utcnow)
 
+class PostUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    tags: Optional[str] = None
+
 class PostResponse(BaseModel):
     post_id: int
     channel_id: int
