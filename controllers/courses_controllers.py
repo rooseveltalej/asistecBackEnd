@@ -30,6 +30,12 @@ def get_user_courses(user_id: int, db: Session = Depends(get_db)):
 
 # Crear un nuevo curso
 def create_course(course: schemas.CourseCreate, db: Session = Depends(get_db)):
+    if not db.query(models.User).filter(models.User.user_id == course.user_id).first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    if not db.query(models.Professor).filter(models.Professor.professor_id == course.professor_id).first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Professor not found")
+
     new_course = models.Course(**course.to_db_dict())  # ← serializa schedule
     db.add(new_course)
     db.commit()

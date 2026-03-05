@@ -27,6 +27,12 @@ def get_posts_by_channel(channel_id: int, db: Session = Depends(get_db)):
 
 # Crear un nuevo post
 def create_post(post: schemas.PostCreate, user_id: int, db: Session):
+    if not db.query(models.User).filter(models.User.user_id == user_id).first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    if not db.query(models.Channel).filter(models.Channel.channel_id == post.channel_id).first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Channel not found")
+
     subscription = (
         db.query(models.Subscription)
         .filter_by(user_id=user_id, channel_id=post.channel_id, is_admin=True)

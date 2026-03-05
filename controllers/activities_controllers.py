@@ -29,6 +29,9 @@ def get_user_activities(user_id: int, db: Session = Depends(get_db)):
 
 # Crear una nueva actividad
 def create_activity(activity: schemas.ActivityCreate, db: Session = Depends(get_db)):
+    if not db.query(models.User).filter(models.User.user_id == activity.user_id).first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
     new_activity = models.Activity(**activity.to_db_dict())
     db.add(new_activity)
     db.commit()
