@@ -7,7 +7,7 @@ class Channel(Base):
     __tablename__ = "channels"
 
     channel_id = Column(Integer, primary_key=True, index=True)
-    channel_name = Column(String, nullable=False)
+    channel_name = Column(String, nullable=False, unique=True)
     area_id = Column(Integer, ForeignKey("areas.area_id"))
 
     area = relationship("Area", back_populates="channels")
