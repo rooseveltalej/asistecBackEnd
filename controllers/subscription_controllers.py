@@ -40,10 +40,7 @@ def create_subscription(
     db.add(new_sub)
     db.commit()
     db.refresh(new_sub)
-    return JSONResponse(
-        content={"msg": "SUCCESS", "subscription_id": new_sub.subscription_id},
-        status_code=status.HTTP_201_CREATED,
-    )
+    return {"msg": "SUCCESS", "subscription_id": new_sub.subscription_id}
 
 
 # Cancelar una suscripción existente (marca is_subscribed=False)
@@ -71,7 +68,7 @@ def cancel_subscription(user_id: int, channel_id: int, db: Session):
     subscription.is_subscribed = False
     db.commit()
 
-    return JSONResponse(content={"msg": "SUCCESS"}, status_code=status.HTTP_200_OK)
+    return {"msg": "SUCCESS"}
 
 
 # Asignar privilegios de administrador a una suscripción existente
@@ -93,10 +90,4 @@ def make_admin(user_id: int, channel_id: int, db: Session):
     db.commit()
     db.refresh(subscription)
 
-    return JSONResponse(
-        content={
-            "msg": "SUCCESS - User promoted to admin",
-            "subscription_id": subscription.subscription_id,
-        },
-        status_code=status.HTTP_200_OK,
-    )
+    return {"msg": "SUCCESS - User promoted to admin", "subscription_id": subscription.subscription_id}

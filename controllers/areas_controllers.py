@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -31,14 +30,7 @@ def create_area(area: schemas.AreaBase, db: Session):
     db.add(new_channel)
     db.commit()
 
-    return JSONResponse(
-        content={
-            "msg": "SUCCESS",
-            "area_id": new_area.area_id,
-            "channel_id": new_channel.channel_id,
-        },
-        status_code=status.HTTP_201_CREATED,
-    )
+    return {"msg": "SUCCESS", "area_id": new_area.area_id, "channel_id": new_channel.channel_id}
 
 
 # Obtener las áreas donde el is_major sea True

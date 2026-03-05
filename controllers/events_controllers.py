@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -28,10 +27,7 @@ def create_event(event: schemas.EventCreate, db: Session):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-    return JSONResponse(
-        content={"msg": "SUCCESS", "event_id": new_event.event_id},
-        status_code=status.HTTP_201_CREATED,
-    )
+    return {"msg": "SUCCESS", "event_id": new_event.event_id}
 
 
 def update_event(
@@ -57,4 +53,4 @@ def delete_event_by_id(event_id: int, db: Session):
     db.delete(db_event)
     db.commit()
 
-    return JSONResponse(content={"msg": "SUCCESS"}, status_code=status.HTTP_200_OK)
+    return {"msg": "SUCCESS"}

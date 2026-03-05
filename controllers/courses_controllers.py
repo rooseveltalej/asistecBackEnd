@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -39,10 +38,7 @@ def create_course(course: schemas.CourseCreate, db: Session):
     db.add(new_course)
     db.commit()
     db.refresh(new_course)
-    return JSONResponse(
-        content={"msg": "SUCCESS", "course_id": new_course.course_id},
-        status_code=status.HTTP_201_CREATED,
-    )
+    return {"msg": "SUCCESS", "course_id": new_course.course_id}
 
 
 # Actualizar un curso existente

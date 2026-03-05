@@ -6,7 +6,6 @@ from datetime import date, datetime, timedelta
 
 # Third-party packages
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
@@ -119,10 +118,7 @@ def create_user(user: schemas.UserCreate, db: Session):
     db.commit()
     db.refresh(new_user)
 
-    return JSONResponse(
-        content={"msg": "SUCCESS", "user_id": new_user.user_id},
-        status_code=status.HTTP_201_CREATED,
-    )
+    return {"msg": "SUCCESS", "user_id": new_user.user_id}
 
 
 def login_user(user: schemas.UserLogin, db: Session):
@@ -281,13 +277,9 @@ def activate_user(user_id: int, db: Session):
         )
 
     if user.is_active:
-        return JSONResponse(
-            content={"msg": "User is already active"}, status_code=status.HTTP_200_OK
-        )
+        return {"msg": "User is already active"}
 
     user.is_active = True
     db.commit()
 
-    return JSONResponse(
-        content={"msg": "User activated successfully"}, status_code=status.HTTP_200_OK
-    )
+    return {"msg": "User activated successfully"}

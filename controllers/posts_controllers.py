@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 import models
@@ -49,10 +48,7 @@ def create_post(post: schemas.PostCreate, user_id: int, db: Session):
     db.commit()
     db.refresh(new_post)
 
-    return JSONResponse(
-        content={"msg": "SUCCESS", "post_id": new_post.post_id},
-        status_code=status.HTTP_201_CREATED,
-    )
+    return {"msg": "SUCCESS", "post_id": new_post.post_id}
 
 
 def update_post(post_id: int, user_id: int, post_data: schemas.PostUpdate, db: Session):
@@ -83,10 +79,7 @@ def update_post(post_id: int, user_id: int, post_data: schemas.PostUpdate, db: S
     db.commit()
     db.refresh(post)
 
-    return JSONResponse(
-        content={"msg": "SUCCESS", "post_id": post.post_id},
-        status_code=status.HTTP_200_OK,
-    )
+    return {"msg": "SUCCESS", "post_id": post.post_id}
 
 
 def delete_post(post_id: int, user_id: int, db: Session):
@@ -110,10 +103,7 @@ def delete_post(post_id: int, user_id: int, db: Session):
     db.delete(post)
     db.commit()
 
-    return JSONResponse(
-        content={"msg": "SUCCESS"},
-        status_code=status.HTTP_200_OK,
-    )
+    return {"msg": "SUCCESS"}
 
 
 def get_recent_user_posts(user_id: int, db: Session):
