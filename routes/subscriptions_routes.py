@@ -14,10 +14,10 @@ def create_subscription_route(subscription: schemas.SubscriptionBase, db: Sessio
 
 # Cancelar una suscripción
 @subscription_router.delete("/cancel_subscription", response_model=dict)
-def cancel_subscription_route(user_id: int, channel_id: int, db: Session = Depends(get_db)):
+def cancel_subscription_route(user_id: str, channel_id: str, db: Session = Depends(get_db)):
     return cancel_subscription(user_id, channel_id, db)
 
 # Asignar privilegios de administrador a un usuario en un canal
 @subscription_router.put("/make_admin", response_model=dict, status_code=status.HTTP_200_OK)
-def make_admin_route(user_id: int, channel_id: int, db: Session = Depends(get_db)):
+def make_admin_route(user_id: str, channel_id: str, db: Session = Depends(get_db)):
     return make_admin(user_id, channel_id, db)

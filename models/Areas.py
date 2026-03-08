@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+import uuid
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
-import datetime
+
 
 class Area(Base):
     __tablename__ = "areas"
 
-    area_id = Column(Integer, primary_key=True, index=True)
+    area_id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     area_name = Column(String, nullable=False, unique=True)
     is_major = Column(Boolean, default=False)
 

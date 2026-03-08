@@ -1,23 +1,25 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Date
+import uuid
+import datetime
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from database import Base
-import datetime
+
 
 class User(Base):
     __tablename__ = "users"
 
-    user_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
     mail = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    carnet_number = Column(String, nullable=False)         # ← Nuevo campo
-    gender = Column(String, nullable=False)                # ← Nuevo campo (M/F/otro)
-    birth_date = Column(Date, nullable=False)              # ← Nuevo campo
-    area_id = Column(Integer, ForeignKey("areas.area_id"))
+    carnet_number = Column(String, nullable=False)
+    gender = Column(String, nullable=False)
+    birth_date = Column(Date, nullable=False)
+    area_id = Column(String(36), ForeignKey("areas.area_id"))
     is_active = Column(Boolean, default=False)
     last_login = Column(DateTime, default=datetime.datetime.utcnow)
-    user_type = Column(Integer, default=1)
+    user_type = Column(String, default="1")
 
     area = relationship("Area", back_populates="users")
     subscriptions = relationship("Subscription", back_populates="user")

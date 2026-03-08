@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+import uuid
+from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 from database import Base
-import datetime
+
 
 class Professor(Base):
     __tablename__ = "professors"
 
-    professor_id = Column(Integer, primary_key=True, index=True)
+    professor_id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     professor_name = Column(String, nullable=False)
     professor_lastname = Column(String, nullable=False)
 

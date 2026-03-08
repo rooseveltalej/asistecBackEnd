@@ -75,7 +75,7 @@ class CourseBase(BaseModel):
         return data
 
 class CourseCreate(CourseBase):
-    user_id: int
+    user_id: str
     professor_name: str
 
     @field_validator("professor_name")
@@ -86,5 +86,5 @@ class CourseCreate(CourseBase):
         return v.strip()
 
 class CourseResponse(CourseBase):
-    course_id: int
+    course_id: str
     model_config = ConfigDict(from_attributes=True)

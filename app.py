@@ -34,6 +34,7 @@ def _seed(db):
 
     # Admin inicial (solo si no existe) -> esto se debe de quitar despues de empezar en producción, es solo para pruebas iniciales
     if not db.query(models.User).filter(models.User.mail == "admin@estudiantec.cr").first():
+        devesa = db.query(models.Area).filter(models.Area.area_name == "DEVESA").first()
         pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
         admin = models.User(
             name="Admin",
@@ -43,9 +44,9 @@ def _seed(db):
             carnet_number="20242417",
             gender="M",
             birth_date=datetime.date(1990, 1, 1),
-            area_id=1,  # DEVESA
+            area_id=devesa.area_id if devesa else None,
             is_active=True,
-            user_type=2,  # 2 = administrador
+            user_type="2",  # 2 = administrador
         )
         db.add(admin)
         db.commit()

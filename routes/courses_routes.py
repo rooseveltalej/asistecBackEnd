@@ -9,7 +9,7 @@ course_router = APIRouter(prefix="/api/courses", tags=["Courses"])
 
 
 @course_router.get("/user_courses")
-def get_user_courses_route(user_id: int, db: Session = Depends(get_db)):
+def get_user_courses_route(user_id: str, db: Session = Depends(get_db)):
     return get_user_courses(user_id, db)
 
 @course_router.post("/course_create", status_code=status.HTTP_201_CREATED)
@@ -17,9 +17,9 @@ def create_course_route(course: schemas.CourseCreate, db: Session = Depends(get_
     return create_course(course, db)
 
 @course_router.put("/course_update")
-def update_course_route(course_id: int, course: schemas.CourseCreate, db: Session = Depends(get_db)):
+def update_course_route(course_id: str, course: schemas.CourseCreate, db: Session = Depends(get_db)):
     return update_course(course_id, course, db)
 
 @course_router.delete("/course_delete")
-def delete_course_route(course_id: int, db: Session = Depends(get_db)):
+def delete_course_route(course_id: str, db: Session = Depends(get_db)):
     return delete_course(course_id, db)

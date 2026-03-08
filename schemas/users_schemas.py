@@ -8,7 +8,7 @@ class UserBase(BaseModel):
     name: str
     lastname: str
     mail: EmailStr
-    area_id: int
+    area_id: str
     carnet_number: str
     gender: str
     birth_date: date
@@ -41,14 +41,14 @@ class UserCreate(UserBase):
         return v
 
 class UserListResponse(BaseModel):
-    user_id: int
+    user_id: str
     name: str
     lastname: str
     mail: str
     carnet_number: str
     gender: str
     birth_date: date
-    area_id: int
+    area_id: str
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)

@@ -74,9 +74,9 @@ class ActivityBase(BaseModel):
         return data
 
 class ActivityCreate(ActivityBase):
-    user_id: int
+    user_id: str
 
 class ActivityResponse(ActivityBase):
-    activity_id: int
+    activity_id: str
     model_config = ConfigDict(from_attributes=True)
 

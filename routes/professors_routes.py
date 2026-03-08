@@ -15,7 +15,7 @@ professor_router = APIRouter(prefix="/api/professors", tags=["Professors"])
 
 @professor_router.get("/", response_model=list[schemas.ProfessorWithAreas])
 def get_all_professors_route(
-    area_id: Optional[int] = Query(None),
+    area_id: Optional[str] = Query(None),
     db: Session = Depends(get_db),
 ):
     return get_all_professors(db, area_id)
@@ -37,6 +37,6 @@ def assign_professor_area_route(
 
 @professor_router.delete("/remove_area")
 def remove_professor_area_route(
-    professor_id: int, area_id: int, db: Session = Depends(get_db)
+    professor_id: str, area_id: str, db: Session = Depends(get_db)
 ):
     return remove_professor_area(professor_id, area_id, db)

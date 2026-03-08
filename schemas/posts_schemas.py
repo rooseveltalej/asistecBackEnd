@@ -4,8 +4,8 @@ from datetime import datetime
 
 # Post Schemas
 class PostCreate(BaseModel):
-    channel_id: int
-    user_id: int
+    channel_id: str
+    user_id: str
     title: str
     content: str
     tags: Optional[str] = None
@@ -16,10 +16,10 @@ class PostUpdate(BaseModel):
     tags: Optional[str] = None
 
 class PostResponse(BaseModel):
-    post_id: int
-    channel_id: int
+    post_id: str
+    channel_id: str
     channel_name: Optional[str] = None
-    user_id: int
+    user_id: str
     title: str
     content: str
     tags: Optional[str] = None

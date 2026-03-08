@@ -1,14 +1,15 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+import uuid
+from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
-import datetime
+
 
 class Channel(Base):
     __tablename__ = "channels"
 
-    channel_id = Column(Integer, primary_key=True, index=True)
+    channel_id = Column(String(36), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     channel_name = Column(String, nullable=False, unique=True)
-    area_id = Column(Integer, ForeignKey("areas.area_id"))
+    area_id = Column(String(36), ForeignKey("areas.area_id"))
 
     area = relationship("Area", back_populates="channels")
     subscriptions = relationship("Subscription", back_populates="channel")

@@ -52,8 +52,8 @@ class EventBase(BaseModel):
         return self
 
 class EventCreate(EventBase):
-    user_id: int
+    user_id: str
 
 class EventResponse(EventBase):
-    event_id: int
+    event_id: str
     model_config = ConfigDict(from_attributes=True)

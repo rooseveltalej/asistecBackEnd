@@ -6,5 +6,5 @@ class AreaBase(BaseModel):
     is_major: bool
 
 class AreaResponse(AreaBase):
-    area_id: int
+    area_id: str
     model_config = ConfigDict(from_attributes=True)

@@ -12,11 +12,11 @@ def get_all_users_route(db: Session = Depends(get_db)):
     return get_all_users(db)
 
 @user_router.get("/next_activities", response_model=list)
-def get_user_next_activities_route(user_id: int, db: Session = Depends(get_db)):
+def get_user_next_activities_route(user_id: str, db: Session = Depends(get_db)):
     return get_user_next_activities(user_id, db)
 
 @user_router.get("/{user_id}", response_model=schemas.UserListResponse)
-def get_user_by_id_route(user_id: int, db: Session = Depends(get_db)):
+def get_user_by_id_route(user_id: str, db: Session = Depends(get_db)):
     return get_user_by_id(user_id, db)
 
 @user_router.post("/user_create", status_code=status.HTTP_201_CREATED)
@@ -38,5 +38,5 @@ def login_user_route(user: schemas.UserLogin, db: Session = Depends(get_db)):
     return provider.login(user, db)
 
 @user_router.put("/activate", response_model=dict)
-def activate_user_route(user_id: int, db: Session = Depends(get_db)):
+def activate_user_route(user_id: str, db: Session = Depends(get_db)):
     return activate_user(user_id, db)

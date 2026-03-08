@@ -21,20 +21,20 @@ class ProfessorBase(BaseModel):
         return v.strip()
 
 class ProfessorResponse(ProfessorBase):
-    professor_id: int
+    professor_id: str
     model_config = ConfigDict(from_attributes=True)
 
 class ProfessorAreaCreate(BaseModel):
-    professor_id: int
-    area_id: int
+    professor_id: str
+    area_id: str
 
 class AreaBasic(BaseModel):
-    area_id: int
+    area_id: str
     area_name: str
     model_config = ConfigDict(from_attributes=True)
 
 class ProfessorWithAreas(BaseModel):
-    professor_id: int
+    professor_id: str
     professor_name: str
     professor_lastname: str
     areas: List[AreaBasic] = []
