@@ -7,8 +7,8 @@ class EventBase(BaseModel):
     event_title: str
     event_description: str
     event_date: date
-    event_start_hour: datetime
-    event_final_hour: datetime
+    event_start_hour: Optional[datetime] = None
+    event_final_hour: Optional[datetime] = None
     notification_datetime: Optional[str] = None
     all_day: bool
 
@@ -35,6 +35,10 @@ class EventBase(BaseModel):
 
     @model_validator(mode="after")
     def validate_hours(self):
+        if self.all_day:
+            return self
+        if self.event_start_hour is None or self.event_final_hour is None:
+            raise ValueError("Las horas de inicio y fin son obligatorias cuando el evento no es de todo el día")
         if self.event_start_hour >= self.event_final_hour:
             raise ValueError("La hora de inicio debe ser antes de la hora de fin")
         if self.event_start_hour.hour < 7:
